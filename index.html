@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="main.css">
+
+    <title>SAT.JS</title>
+  </head>
+
+  <body>
+	<div class="container">
+		<div class="row">
+			<div class="col-8">
+				<b>SAT.JS by Kevin Poulton M0VXY</b>
+				<p>This tool is designed to give you a snapshot of upcoming amateur satellites over your location. Written in native javascript,
+					with the prediction code being based on BASIC routines taken from the 1980's classic 'Amateur Radio Software' by John Morris GM4ANB.</p>
+				<p>If you have any questions feel free to e-mail me <a href="mailto:kevin@secondinternet.com">kevin@secondinternet.com</a></p>
+			</div>
+		</div>
+		<div class="row">
+				<label for="maidenhead_tb" class="col-3 form-label">Maidenhead locator</label>&nbsp;
+				<input onKeyUp="javascript:validateForm();" type="text" class="col-2 form-control w-25" id="maidenhead_tb" placeholder="(e.g. io91xo)">&nbsp;
+				<button onClick="javascript:submitForm();" id="predict_button" disabled class="col-2 btn btn-primary ">Predict</button>
+		</div>
+		<div id="div_passes">
+		</div>
+	</div>
+	
+	  
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script src="Satellite.class.js"></script>
+	<script src="main.js"></script>
+	
+	<script>
+		
+		function validateForm() {
+			
+			let re = /^[a-r][a-r][0-9][0-9][a-x][a-x]$/;
+
+			maidenhead = document.getElementById('maidenhead_tb').value.toLowerCase()
+			predict_button = document.getElementById('predict_button')
+				if(maidenhead.match(re)) {
+				predict_button.disabled = false
+			} else {
+				predict_button.disabled = true
+			}
+		}
+
+		function submitForm() {
+			result = predict_passes(document.getElementById('maidenhead_tb').value.toLowerCase())
+			if(result !== true) {
+				error = document.getElementById('div_passes')
+				error.innerHTML = `<div class="row mt-2"><div class="col-7 alert alert-danger" role="alert">${result}</div></div>`
+			}
+		}
+	</script>
+
+  </body>
+</html>

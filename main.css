@@ -1,0 +1,13 @@
+.main-text {
+	font: 1.0rem Inconsolata, monospace;
+}
+
+.negative {
+	color: red;
+	font-weight: bold;
+}
+
+.positive {
+	color: green;
+	font-weight: bold;
+}

@@ -24,8 +24,8 @@ let satellite_data = [
   {'in_scope': true, 'tle_designation' : 'XW-2E', 'amsat_status_designations': ['XW-2E'],'frequencies' : {'linear downlink +/-10' : 145.925, 'linear uplink': 435.280}},
   {'in_scope': true, 'tle_designation' : 'XW-2F', 'amsat_status_designations': ['XW-2F'],'frequencies' : {'linear downlink +/-10' : 145.990, 'linear uplink': 435.340}},
 
-  {'in_scope': true, 'tle_designation' : 'AO-07', 'amsat_status_designations': ['[A]_AO-7', '[B]_AO-7'],'frequencies' : {}},
-  {'in_scope': true, 'tle_designation' : 'RS-44', 'amsat_status_designations': ['RS-44'],'frequencies' : {}}
+  {'in_scope': true, 'tle_designation' : 'AO-07', 'amsat_status_designations': ['[A]_AO-7', '[B]_AO-7'],'frequencies' : {'B linear uplink +/-0.03': 432.150, 'linear downlink +/-0.03': 145.950}},
+  {'in_scope': true, 'tle_designation' : 'RS-44', 'amsat_status_designations': ['RS-44'],'frequencies' : {'Beacon': 435.605, 'linear uplink +/-0.03': 145.965, 'linear downling +/-0.03': 435.640}}
 ]
 
 
@@ -313,6 +313,8 @@ function refresh_display() {
     startF = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.start)
     endF = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.end)
 
+    let tta = Math.floor((pass.start - Date.now()) / 1000 / 60);
+
     frequencyF = ''
 
     Object.keys(pass.frequencies).forEach(key => {
@@ -324,9 +326,9 @@ function refresh_display() {
       <div class="col-12">
         <div class="card m-6">
           <div class="card-body">
-            <h5 class="card-title">${pass.tle_designation}</h5>
-            <p class="card-text"><b>Start</b>: ${startF}</p>
-            <p class="card-text"><b>End</b>: ${endF}</p>
+            <h5 class="card-title"><b>${pass.tle_designation} TTA: ${tta}m</b></h5> 
+            <p class="card-text"><b>Start</b>: ${startF} UTC</p>
+            <p class="card-text"><b>End</b>: ${endF} UTC</p>
             <p class="card-text"><b>Path</b>: ${pass.path} <b>Max El</b>: ${pass.max_el.toFixed(1)} deg.</p></p>
             <p class="card-text"><b>AMSAT net +ve reports / 2 hours</b>: ${pass.amsat_status_report_text}</p>
              ${frequencyF}

@@ -15,7 +15,7 @@
   <body>
 	<div class="container">
 		<div class="row">
-			<div class="col-8">
+			<div class="col-12">
 				<b>SAT.JS by Kevin Poulton M0VXY</b>
 				<p>This tool is designed to give you a snapshot of upcoming amateur satellites over your location. Written in native javascript,
 					with the prediction code being based on BASIC routines taken from the 1980's classic 'Amateur Radio Software' by John Morris GM4ANB.</p>
@@ -23,9 +23,15 @@
 			</div>
 		</div>
 		<div class="row">
-				<label for="maidenhead_tb" class="col-3 form-label">Maidenhead locator</label>&nbsp;
-				<input onKeyUp="javascript:validateForm();" type="text" class="col-2 form-control w-25" id="maidenhead_tb" placeholder="(e.g. io91xo)">&nbsp;
-				<button onClick="javascript:submitForm();" id="predict_button" disabled class="col-2 btn btn-primary ">Predict</button>
+			<div class="col-4">
+				<label for="maidenhead_tb" class="form-label">Maidenhead locator</label>
+			</div>
+			<div class="col-4">
+				<input onKeyUp="javascript:validateForm();" type="text" class="form-control" id="maidenhead_tb" placeholder="(e.g. io91xo)">
+			</div>
+			<div class="col-4">
+				<button onClick="javascript:submitForm();" id="predict_button" disabled class="btn btn-primary ">Predict</button>
+			</div>
 		</div>
 		<div id="div_passes">
 		</div>

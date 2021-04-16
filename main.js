@@ -321,7 +321,7 @@ function refresh_display() {
 
     inner_HTML += `
     <div class="row mt-2">
-      <div class="col-8">
+      <div class="col-12">
         <div class="card m-6">
           <div class="card-body">
             <h5 class="card-title">${pass.tle_designation}</h5>

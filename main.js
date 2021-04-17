@@ -33,6 +33,7 @@ let satellites = []             // a global array to store all of the satellite 
 let passes = []                 // the passes that we have successfully found
 let analysis_step = 0           // What step of the loading process we are in
 let files_to_load = 1           // How many files remain to be loaded (1 for the elements file)
+let files_loaded = 0
 let attempts = 0                // How many attempts we've made to wait for the files to load
 let elements_reader = new XMLHttpRequest() || new ActiveXObject('MSXML2.XMLHTTP')   // the reader for the elements file
 
@@ -87,7 +88,6 @@ function load_data() {
     attempts++;
 
     let all_loaded = true
-    let files_loaded = 0
 
     /* Start witht the satellite amsat status files */
     Object.keys(satellites).forEach(key => {
@@ -209,7 +209,7 @@ function load_data() {
   analysis_step = 3 
 }
 
-function predict_passes(maidenhead) {
+function predict_passes(station_location) {
 
   //let station_latitude  = 51.50853
   //let station_longitude = -0.12574
@@ -217,25 +217,19 @@ function predict_passes(maidenhead) {
   /* We need to take the maidenhead square and convert it into longitude or latitude 
      Firstly, split i into different characters */
 
-  
-  let re = /^[a-r][a-r][0-9][0-9][a-x][a-x]$/;
-  maidenhead = maidenhead.toLowerCase()
-  let match = maidenhead.match(re)
-  if(!(match && maidenhead === match[0])) {
-    return "Error: This is not a valid maidenhead square."
+  if(station_location.valid !== true) {
+    return "Error: This is not a valid location"
   }
-
-
-  let characters = maidenhead.split('')
   
-  let station_longitude = 20 * (characters[0].charCodeAt(0)-97) + 2 * (characters[2].charCodeAt(0)-48) + (5/60) * (characters[4].charCodeAt(0)-97) - 180 
-  let station_latitude = 10 * (characters[1].charCodeAt(0)-97) + 1 * (characters[3].charCodeAt(0)-48) + (2.5/60) * (characters[5].charCodeAt(0)-97) - 90 
-  let station_height    = 0
+  let station_longitude = station_location.longitude
+  let station_latitude =  station_location.latitude
+  let station_height    =  station_location.height
   
 
   if(analysis_step != 3) {
-    setTimeout(predict_passes, 1000)
+    return 'Satellites not yet loaded correctly...give it a second.'
   }
+
   console.log("It appears all data is loaded, going to try and predict passes.")
 
   passes = []  
@@ -314,6 +308,10 @@ function refresh_display() {
     endF = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.end)
 
     let tta = Math.floor((pass.start - Date.now()) / 1000 / 60);
+    let ttaText = '<span class="negative">In Progress</span>';
+    if(tta > 0) {
+      ttaText = tta.toString() + " minutes to acquisition."
+    }
 
     frequencyF = ''
 
@@ -326,7 +324,7 @@ function refresh_display() {
       <div class="col-12">
         <div class="card m-6">
           <div class="card-body">
-            <h5 class="card-title"><b>${pass.tle_designation} TTA: ${tta}m</b></h5> 
+            <h5 class="card-title"><b>${pass.tle_designation} ${ttaText}</b></h5> 
             <p class="card-text"><b>Start</b>: ${startF} UTC</p>
             <p class="card-text"><b>End</b>: ${endF} UTC</p>
             <p class="card-text"><b>Path</b>: ${pass.path} <b>Max El</b>: ${pass.max_el.toFixed(1)} deg.</p></p>

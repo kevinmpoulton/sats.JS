@@ -24,10 +24,10 @@
 		</div>
 		<div class="row">
 			<div class="col-4">
-				<label for="maidenhead_tb" class="form-label">Maidenhead locator</label>
+				<label for="location_tb" class="form-label">Location (maidenhead)</label>
 			</div>
 			<div class="col-4">
-				<input onKeyUp="javascript:validateForm();" type="text" class="form-control" id="maidenhead_tb" placeholder="(e.g. io91xo)">
+				<input onKeyUp="javascript:updateButton();" type="text" class="form-control" id="location_tb" placeholder="(e.g. io91xo)">
 			</div>
 			<div class="col-4">
 				<button onClick="javascript:submitForm();" id="predict_button" disabled class="btn btn-primary ">Predict</button>
@@ -43,30 +43,55 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script src="Locations.class.js"></script>
 	<script src="Satellite.class.js"></script>
 	<script src="main.js"></script>
 	
 	<script>
 		
-		function validateForm() {
-			
-			let re = /^[a-r][a-r][0-9][0-9][a-x][a-x]$/;
+		let predictButton = document.getElementById('predict_button')
+		let locationTextField = document.getElementById('location_tb')
+		
+		/* Pre-populate the maidenhead square locator if it is provided as a get parameter */
+		const urlParams = new URLSearchParams(window.location.search)
+		const stationLocationParam = urlParams.get('station_location')
 
-			maidenhead = document.getElementById('maidenhead_tb').value.toLowerCase()
-			predict_button = document.getElementById('predict_button')
-				if(maidenhead.match(re)) {
-				predict_button.disabled = false
-			} else {
-				predict_button.disabled = true
-			}
+		let stationLocation = new Location(stationLocationParam)
+		
+		if(stationLocation.valid) {
+			locationTextField.value = stationLocation.maidenhead
 		}
 
+		updateButton();
+		
 		function submitForm() {
-			result = predict_passes(document.getElementById('maidenhead_tb').value.toLowerCase())
+			result = predict_passes(stationLocation)
 			if(result !== true) {
 				error = document.getElementById('div_passes')
 				error.innerHTML = `<div class="row mt-2"><div class="col-7 alert alert-danger" role="alert">${result}</div></div>`
 			}
+		}
+
+		function updateButton() {
+			 stationLocation = new Location(locationTextField.value)
+
+			if(!stationLocation.valid) {
+				predictButton.disabled = true;
+				predictButton.innerHTML = 'Enter a valid location'
+				return
+			}
+			
+			if(analysis_step != 3) {
+				predictButton.disabled = true;
+				predictButton.innerHTML = 'Loading ' + files_to_load + ' files.'
+				setTimeout(updateButton,100)
+				return
+			}
+
+			predictButton.disabled = false;
+			predictButton.innerHTML = 'Press to refresh'
+
+
 		}
 	</script>
 

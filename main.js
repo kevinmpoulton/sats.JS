@@ -257,9 +257,11 @@ function predict_passes(station_location) {
     let az2 = 0 
     let az3 = 0 
 
-    for(t=0; t < 60*24; ++t) {
+    /* Current set to per second accuracy that means one estimation calculation is made for every second */
 
-        let analysis_time = new Date((Date.now()+t*60000))
+    for(t=-600; t < 60 * 60 * 24; ++t) {
+
+        let analysis_time = new Date((Date.now()+t*1000))
         r = satellites[key].predict(station_latitude, station_longitude, station_height, analysis_time)
 
         if(r.el >= observable_elevation && pass_open == false) {
@@ -279,7 +281,10 @@ function predict_passes(station_location) {
             az3 = r.az
             this_pass.path = az1.toFixed(0) + '-'+  az2.toFixed(0) + '-' +  az3.toFixed(0)
 
-            passes.push(this_pass)
+            if(this_pass.end > Date.now()) {
+              passes.push(this_pass)
+            }
+            
             this_pass = {...empty_pass}
             pass_count = pass_count + 1
 

@@ -32,6 +32,7 @@ class Satellite {
       this.tle_designation = metadata.tle_designation
       this.amsat_status_designations = metadata.amsat_status_designations
       this.frequencies = metadata.frequencies
+      this.url = metadata.url
 
       this.readers = []
 
@@ -243,7 +244,7 @@ class Satellite {
     let t4 = Math.floor((t_analysis-Math.floor(t_analysis))*2400+0.5)/100
     t4 = 100*((t4-Math.floor(t4))*0.6+Math.floor(t4))
 
-    return {'utc': t4, 'az': (a9 + 0.5), 'el': (e9+0.5)}
+    return {'utc': t4, 'az': (a9 + 0.5), 'el': (e9+0.5), 'distance': Math.sqrt(r5)}
   }
 
 }

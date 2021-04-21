@@ -10,32 +10,18 @@
    used to index the elements file with the different designations used by the AMSAT status API. It 
    also includes the different frequencies used by the satellite */
 
-let satellite_data = [
 
-  {'in_scope': true, 'tle_designation' : 'ISS', 'amsat_status_designations': ['ISS-DATA', 'ISS-DATV', 'ISS-FM'],'frequencies' : {'Packet': 145.800}},  
-  {'in_scope': true, 'tle_designation' : 'AO-91', 'amsat_status_designations': ['AO-91'],'frequencies' : {'FM uplink 67Hz Tone' : 435.250, 'FM downlink': 145.960}},
-  {'in_scope': true, 'tle_designation' : 'SO-50', 'amsat_status_designations': ['SO-50'],'frequencies' : {'FM uplink 67Hz Tone + 2s PL Tone 74.4' : 145.850, 'FM downlink': 436.795}},
-  {'in_scope': true, 'tle_designation' : 'CAS-4A', 'amsat_status_designations': ['CAS-4A'],'frequencies' : {'linear downlink' : 145.870, 'linear uplink': 435.220}},
-  {'in_scope': true, 'tle_designation' : 'CAS-4B', 'amsat_status_designations': ['CAS-4B'],'frequencies' : {'linear downlink' : 145.925, 'linear uplink': 435.280}},
-  {'in_scope': true, 'tle_designation' : 'XW-2A', 'amsat_status_designations': ['XW-2A'],'frequencies' : {'linear downlink +/-10' : 145.675, 'linear uplink': 435.040}},
-  {'in_scope': true, 'tle_designation' : 'XW-2B', 'amsat_status_designations': ['XW-2B'],'frequencies' : {'linear downlink +/-10' : 145.740, 'linear uplink': 435.100}},
-  {'in_scope': true, 'tle_designation' : 'XW-2C', 'amsat_status_designations': ['XW-2C'],'frequencies' : {'linear downlink +/-10' : 145.805, 'linear uplink': 435.160}},
-  {'in_scope': true, 'tle_designation' : 'XW-2D', 'amsat_status_designations': ['XW-2D'],'frequencies' : {'linear downlink +/-10' : 145.870, 'linear uplink': 435.220}},
-  {'in_scope': true, 'tle_designation' : 'XW-2E', 'amsat_status_designations': ['XW-2E'],'frequencies' : {'linear downlink +/-10' : 145.925, 'linear uplink': 435.280}},
-  {'in_scope': true, 'tle_designation' : 'XW-2F', 'amsat_status_designations': ['XW-2F'],'frequencies' : {'linear downlink +/-10' : 145.990, 'linear uplink': 435.340}},
-
-  {'in_scope': true, 'tle_designation' : 'AO-07', 'amsat_status_designations': ['[A]_AO-7', '[B]_AO-7'],'frequencies' : {'B linear uplink +/-0.03': 432.150, 'linear downlink +/-0.03': 145.950}},
-  {'in_scope': true, 'tle_designation' : 'RS-44', 'amsat_status_designations': ['RS-44'],'frequencies' : {'Beacon': 435.605, 'linear uplink +/-0.03': 145.965, 'linear downling +/-0.03': 435.640}}
-]
 
 
 let satellites = []             // a global array to store all of the satellite objects we will create
 let passes = []                 // the passes that we have successfully found
 let analysis_step = 0           // What step of the loading process we are in
 let files_to_load = 1           // How many files remain to be loaded (1 for the elements file)
-let files_loaded = 0
+let files_loaded = 0            // Number of files actually loaded
 let attempts = 0                // How many attempts we've made to wait for the files to load
 let elements_reader = new XMLHttpRequest() || new ActiveXObject('MSXML2.XMLHTTP')   // the reader for the elements file
+var stationLocation  = ''       // The station location 
+var distances = {}              // Stores the distances for purposes of calculating the velocity and doppler
 
 /* Load the elements file, and all the individual AMSAT status files required for the in-scope satellites 
    because this is done asynchronously we simply kick everything off, then keep checking every second to 
@@ -234,7 +220,12 @@ function predict_passes(station_location) {
 
   passes = []  
 
+  /* Display elements stores a reference for all the divs we create 
+     so we can update 'live' with current position information */
 
+  elements_to_update = []
+  
+  let pass_ID = 0
 
   /* Iterate through each of our satellites */
   Object.keys(satellites).forEach(key => {
@@ -244,9 +235,8 @@ function predict_passes(station_location) {
         'end' : 0, 
         'max_el' : 0, 
         'path': '', 
-        'tle_designation' : satellites[key].tle_designation, 
-        'frequencies': satellites[key].frequencies, 
-        'amsat_status_report_text': satellites[key].amsat_status_report_text
+        'satellite_key': key,
+        'satellite': satellites[key]
     }
 
     let this_pass = {...empty_pass}
@@ -287,18 +277,22 @@ function predict_passes(station_location) {
             
             this_pass = {...empty_pass}
             pass_count = pass_count + 1
+            
+            pass_ID = pass_ID + 1
 
             if(pass_count == 3) {
                 break
             }
         }
     }
+    
   
   })
 
   /* Sort the passes by the start time of the pass */
   passes.sort((a, b) => (a.start > b.start) ? 1 : -1)
   console.log("Completed calculating passes.")
+  
   return refresh_display()
 }
 
@@ -316,12 +310,23 @@ function refresh_display() {
     let ttaText = '<span class="negative">In Progress</span>';
     if(tta > 0) {
       ttaText = tta.toString() + " minutes to acquisition."
+    } else {
     }
 
-    frequencyF = ''
+    let frequencyF = ''
+    let urlF = ''
+    console.log(pass.satellite.url)
+    if(pass.satellite.url) {
+      urlF = `<p class="card-text"><a target="_blank" href="${pass.satellite.url}">Click for more info</a></p>`
+    }
 
-    Object.keys(pass.frequencies).forEach(key => {
-      frequencyF += `<p class="card-text"><b>${key}</b>: ${pass.frequencies[key]} MHz</p>`
+    Object.keys(pass.satellite.frequencies).forEach(key => {
+
+      frequencyF += `<p class="card-text"><b>${pass.satellite.frequencies[key].description}</b>: ${pass.satellite.frequencies[key].frequency_mid} MHz `
+      if(pass.satellite.frequencies[key].access_details) {
+        frequencyF += `${pass.satellite.frequencies[key].access_details}</b> `
+      }
+      frequencyF += `<b>Doppler Correction</b>: <span name="${pass.satellite.tle_designation}_${key}_current_doppler">Don't know</span> </p>`
     })
 
     inner_HTML += `
@@ -329,12 +334,19 @@ function refresh_display() {
       <div class="col-12">
         <div class="card m-6">
           <div class="card-body">
-            <h5 class="card-title"><b>${pass.tle_designation} ${ttaText}</b></h5> 
+            <h5 class="card-title"><b>${pass.satellite.tle_designation} ${ttaText}</b></h5> 
             <p class="card-text"><b>Start</b>: ${startF} UTC</p>
             <p class="card-text"><b>End</b>: ${endF} UTC</p>
             <p class="card-text"><b>Path</b>: ${pass.path} <b>Max El</b>: ${pass.max_el.toFixed(1)} deg.</p></p>
-            <p class="card-text"><b>AMSAT net +ve reports / 2 hours</b>: ${pass.amsat_status_report_text}</p>
+            <p class="card-text">
+              <b>Current Dist</b>: <span name="${pass.satellite.tle_designation}_current_dist">Don't know</span>
+              <b>Current Az</b>: <span name="${pass.satellite.tle_designation}_current_az">Don't know</span>
+              <b>Current El</b>: <span name="${pass.satellite.tle_designation}_current_el">Don't know</span>
+              <b>Current Velocity</b>: <span name="${pass.satellite.tle_designation}_current_vel">Don't know</span>
+            </p>
+            <p class="card-text"><b>AMSAT net +ve reports / 2 hours</b>: ${pass.satellite.amsat_status_report_text}</p>
              ${frequencyF}
+             ${urlF}
           </div>
         </div>
       </div>
@@ -342,7 +354,39 @@ function refresh_display() {
   })
 
   document.getElementById('div_passes').innerHTML = inner_HTML
-  return true
+  return update_current_locations()
+}
+
+function update_current_locations() {
+
+    Object.keys(satellites).forEach(key => {
+      let satellite = satellites[key]
+      let r = satellite.predict(stationLocation.latitude,stationLocation.longitude, stationLocation.height, new Date(Date.now()))
+      
+      // Calculate the delta in the distance and thus the velocity
+      distanceDelta = distances[satellite.tle_designation] - r['distance']
+      distances[satellite.tle_designation] = r['distance']
+      doppler = distanceDelta / 3e5 
+      
+      for(let e of document.getElementsByName(satellite.tle_designation + '_current_az')) {e.innerHTML=r['az'].toFixed(1)}
+      for(let e of document.getElementsByName(satellite.tle_designation + '_current_el')) {e.innerHTML=r['el'].toFixed(1)}
+      for(let e of document.getElementsByName(satellite.tle_designation + '_current_dist')) {e.innerHTML=r['distance'].toFixed(1)}
+      for(let e of document.getElementsByName(satellite.tle_designation + '_current_vel')) {e.innerHTML=distanceDelta.toFixed(1)}
+      
+      Object.keys(satellite.frequencies).forEach(key => {
+        let newFrequency = 0
+        if(satellite.frequencies[key].direction == 'up') {
+           newFrequency = satellite.frequencies[key].frequency_mid - doppler * satellite.frequencies[key].frequency_mid
+        } else {
+          newFrequency = satellite.frequencies[key].frequency_mid + doppler * satellite.frequencies[key].frequency_mid
+        }
+
+        for(let e of document.getElementsByName(satellite.tle_designation + '_' + key + '_current_doppler')) {e.innerHTML=newFrequency.toFixed(5) + ' Mhz'}
+      })
+    
+    })
+    setTimeout(update_current_locations, 1000)
+    return true
 }
 
 

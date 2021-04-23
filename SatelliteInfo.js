@@ -51,7 +51,9 @@ let satellite_data = [
     'frequencies' : 
         {
             'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.040},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.675}
+            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.675},
+            'CW' : {'description' : 'CW Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.855},
+            'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.835}
         }
     },
     

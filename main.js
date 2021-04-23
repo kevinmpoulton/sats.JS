@@ -11,17 +11,17 @@
    also includes the different frequencies used by the satellite */
 
 
-
-
-let satellites = []             // a global array to store all of the satellite objects we will create
+let satellites = []             // all of the satellite objects we will create
 let passes = []                 // the passes that we have successfully found
-let analysis_step = 0           // What step of the loading process we are in
-let files_to_load = 1           // How many files remain to be loaded (1 for the elements file)
-let files_loaded = 0            // Number of files actually loaded
+let analysisStep = 0            // What step of the loading process we are in
+let filesToLoad = 1             // How many files remain to be loaded (1 for the elements file)
+let filesLoaded = 0             // Number of files actually loaded
 let attempts = 0                // How many attempts we've made to wait for the files to load
-let elements_reader = new XMLHttpRequest() || new ActiveXObject('MSXML2.XMLHTTP')   // the reader for the elements file
+let elementsReader = new XMLHttpRequest() || new ActiveXObject('MSXML2.XMLHTTP')   // the reader for the elements file
 var stationLocation  = ''       // The station location 
 var distances = {}              // Stores the distances for purposes of calculating the velocity and doppler
+
+const MINIMUM_PASS_ELEVATION = 10   // The minimum elevation for which we want to show a pass
 
 /* Load the elements file, and all the individual AMSAT status files required for the in-scope satellites 
    because this is done asynchronously we simply kick everything off, then keep checking every second to 
@@ -33,15 +33,15 @@ var distances = {}              // Stores the distances for purposes of calculat
 
 function load_data() {
     
-  if(analysis_step == 0) {
+  if(analysisStep == 0) {
 
     console.log("Starting step 0")
       
     /* Kick off the loading of the analysis file */
     let elements_url = 'https://api.secondinternet.com/satellites/elements/'
 
-    elements_reader.open('get',elements_url , true); 
-    elements_reader.send()
+    elementsReader.open('get',elements_url , true); 
+    elementsReader.send()
 
     /* Work through each of the in scope satellites, creating the objects for them
        which also triggers the loading of the AMSAT status file */
@@ -54,26 +54,27 @@ function load_data() {
 
       if(!(satellite_in_scope.tle_designation in satellites)) {
         satellites[satellite_in_scope.tle_designation] = new Satellite(satellite_in_scope)
-        files_to_load += satellite_in_scope['amsat_status_designations'].length
+        filesToLoad += satellite_in_scope.amsat_status_designations.length
       } 
       
     })
     
-    console.log("...started loading " + files_to_load + " files and moving to step 1")
+    console.log("...started loading " + filesToLoad + " files and moving to step 1")
 
-    analysis_step = 1
+    analysisStep = 1
 
     setTimeout(load_data, 1000)
     return
   }
 
   /* Step 1 checks to see if the files we have kicked off loading have completed yet */
-  if(analysis_step == 1) {
+  if(analysisStep == 1) {
     console.log("Starting step 1")
 
     attempts++;
 
     let all_loaded = true
+    filesLoaded = 0
 
     /* Start witht the satellite amsat status files */
     Object.keys(satellites).forEach(key => {
@@ -82,21 +83,21 @@ function load_data() {
           if(satellite.readers[key].readyState != 4) {
             all_loaded = false
           } else {
-            files_loaded++
+            filesLoaded++
           }
         })
       }
     )
 
     /* And check the elements file also */
-    if(elements_reader.readyState != 4) {
+    if(elementsReader.readyState != 4) {
       all_loaded = false
     } else {
-      files_loaded++
+      filesLoaded++
     }
       
     if(all_loaded == false) {
-      console.log("...Not all satellite files loaded (done",files_loaded,"/", files_to_load,"), trying again")
+      console.log("...Not all satellite files loaded (done",filesLoaded,"/", filesToLoad,"), trying again")
       if(attempts < 6) {
         setTimeout(load_data, 1000)
       } else {
@@ -105,8 +106,8 @@ function load_data() {
       return
     }
 
-    analysis_step = 2
-    console.log("...All satellite files loaded (", files_loaded, ")")
+    analysisStep = 2
+    console.log("...All satellite files loaded (", filesLoaded, ")")
   }
 
   console.log("Starting step 2")
@@ -115,7 +116,7 @@ function load_data() {
   /* First order of business is to process the elements file and 
      append it to each of the satellites */
   
-  lines = elements_reader.responseText.split('\n')
+  lines = elementsReader.responseText.split('\n')
   
   let satellite_elements_loaded = 0;
 
@@ -192,7 +193,7 @@ function load_data() {
 
   /* Ok, at this point all data is loaded and made ready for analysis */
   console.log("Completed load process, now moving to stage 3")
-  analysis_step = 3 
+  analysisStep = 3 
 }
 
 function predict_passes(station_location) {
@@ -212,7 +213,7 @@ function predict_passes(station_location) {
   let station_height    =  station_location.height
   
 
-  if(analysis_step != 3) {
+  if(analysisStep != 3) {
     return 'Satellites not yet loaded correctly...give it a second.'
   }
 
@@ -241,7 +242,7 @@ function predict_passes(station_location) {
 
     let this_pass = {...empty_pass}
     let pass_open = false
-    let observable_elevation = 0
+    let minimum_pass_elevation = MINIMUM_PASS_ELEVATION
     let pass_count = 0
     let az1 = 0
     let az2 = 0 
@@ -254,7 +255,7 @@ function predict_passes(station_location) {
         let analysis_time = new Date((Date.now()+t*1000))
         r = satellites[key].predict(station_latitude, station_longitude, station_height, analysis_time)
 
-        if(r.el >= observable_elevation && pass_open == false) {
+        if(r.el >= minimum_pass_elevation && pass_open == false) {
             pass_open = true
             this_pass.start = analysis_time
             az1 = r.az
@@ -265,7 +266,7 @@ function predict_passes(station_location) {
                 az2 = r['az']
         }
 
-        if(r.el < observable_elevation && pass_open == true) {
+        if(r.el < minimum_pass_elevation && pass_open == true) {
             pass_open = false
             this_pass.end = analysis_time
             az3 = r.az
@@ -307,11 +308,10 @@ function refresh_display() {
     endF = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.end)
 
     let tta = Math.floor((pass.start - Date.now()) / 1000 / 60);
-    let ttaText = '<span class="negative">In Progress</span>';
+    let ttaText = `<span class="negative">In Progress</span><h5 class="card-title"><span name="${pass.satellite.tle_designation}_current_pointing" class="positive">errr...</span></h5>`
     if(tta > 0) {
       ttaText = tta.toString() + " minutes to acquisition."
-    } else {
-    }
+    } 
 
     let frequencyF = ''
     let urlF = ''
@@ -363,15 +363,19 @@ function update_current_locations() {
       let satellite = satellites[key]
       let r = satellite.predict(stationLocation.latitude,stationLocation.longitude, stationLocation.height, new Date(Date.now()))
       
-      // Calculate the delta in the distance and thus the velocity
+      // Calculate the delta in the distance and thus the velocity and te doppler shift 
       distanceDelta = distances[satellite.tle_designation] - r['distance']
       distances[satellite.tle_designation] = r['distance']
       doppler = distanceDelta / 3e5 
+
       
       for(let e of document.getElementsByName(satellite.tle_designation + '_current_az')) {e.innerHTML=r['az'].toFixed(1)}
       for(let e of document.getElementsByName(satellite.tle_designation + '_current_el')) {e.innerHTML=r['el'].toFixed(1)}
       for(let e of document.getElementsByName(satellite.tle_designation + '_current_dist')) {e.innerHTML=r['distance'].toFixed(1)}
       for(let e of document.getElementsByName(satellite.tle_designation + '_current_vel')) {e.innerHTML=distanceDelta.toFixed(1)}
+      for(let e of document.getElementsByName(satellite.tle_designation + '_current_pointing')) {
+        e.innerHTML="Azimuth: " + r['az'].toFixed(1) + " Elevation " + r['el'].toFixed(1) + "°" 
+      }
       
       Object.keys(satellite.frequencies).forEach(key => {
         let newFrequency = 0
@@ -381,7 +385,7 @@ function update_current_locations() {
           newFrequency = satellite.frequencies[key].frequency_mid + doppler * satellite.frequencies[key].frequency_mid
         }
 
-        for(let e of document.getElementsByName(satellite.tle_designation + '_' + key + '_current_doppler')) {e.innerHTML=newFrequency.toFixed(5) + ' Mhz'}
+        for(let e of document.getElementsByName(satellite.tle_designation + '_' + key + '_current_doppler')) {e.innerHTML=newFrequency.toFixed(6) + ' Mhz'}
       })
     
     })
@@ -390,9 +394,6 @@ function update_current_locations() {
 }
 
 
-load_data()
-//setTimeout(refresh_display, 3000)
-//predict_passes()
 
 
 

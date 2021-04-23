@@ -55,6 +55,10 @@
 	
 	<script>
 		
+		// Start the loading process
+		load_data()
+
+		// The HTML elements on the form we need to refer to 
 		let predictButton = document.getElementById('predict_button')
 		let locationTextField = document.getElementById('location_tb')
 		
@@ -67,7 +71,8 @@
 		if(stationLocation.valid) {
 			locationTextField.value = stationLocation.maidenhead
 		}
-
+		
+		// Validate the location parameter and if ok enable the button 
 		updateButton();
 		
 		function submitForm() {
@@ -87,9 +92,9 @@
 				return
 			}
 			
-			if(analysis_step != 3) {
+			if(analysisStep != 3) {
 				predictButton.disabled = true;
-				predictButton.innerHTML = 'Loading ' + (files_to_load-files_loaded) + ' files.'
+				predictButton.innerHTML = 'Loading ' + (filesToLoad - filesLoaded) + ' files.'
 				setTimeout(updateButton,100)
 				return
 			}
@@ -97,9 +102,8 @@
 			predictButton.disabled = false;
 			predictButton.innerHTML = 'Press to refresh'
 			submitForm()
-
-
 		}
+		
 	</script>
 
   </body>

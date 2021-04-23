@@ -47,53 +47,63 @@ let satellite_data = [
         }
     },
     
-    {'tle_designation' : 'XW-2A', 'in_scope': true, 'amsat_status_designations': ['XW-2A'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
+    {'tle_designation' : 'XW-2A', 'in_scope': true, 'amsat_status_designations': ['XW-2A'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
             'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.040},
             'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.675},
-            'CW' : {'description' : 'CW Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.855},
+            'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.855},
             'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.835}
         }
     },
     
-    {'tle_designation' : 'XW-2B', 'in_scope': true, 'amsat_status_designations': ['XW-2B'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
+    {'tle_designation' : 'XW-2B', 'in_scope': true, 'amsat_status_designations': ['XW-2B'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
             'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.100},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.740}
+            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.740},
+            'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.725},
+            'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.705}
         }
     },
     
-    {'tle_designation' : 'XW-2C', 'in_scope': true, 'amsat_status_designations': ['XW-2C'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
+    {'tle_designation' : 'XW-2C', 'in_scope': true, 'amsat_status_designations': ['XW-2C'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
             'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.160},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.805}
+            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.805},
+            'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.790},
+            'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 147.770}
         }
     },
     
-    {'tle_designation' : 'XW-2D', 'in_scope': true, 'amsat_status_designations': ['XW-2D'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
+    {'tle_designation' : 'XW-2D', 'in_scope': true, 'amsat_status_designations': ['XW-2D'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
             'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.220},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.870}
+            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.870},
+            'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.855},
+            'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.835}
         }
     },
     
-    {'tle_designation' : 'XW-2E', 'in_scope': true, 'amsat_status_designations': ['XW-2E'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
+    {'tle_designation' : 'XW-2E', 'in_scope': true, 'amsat_status_designations': ['XW-2E'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
             'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.280},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.925}
+            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.925},
+            'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.910},
+            'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.890}
         }
     },
     
-    {'tle_designation' : 'XW-2F', 'in_scope': true, 'amsat_status_designations': ['XW-2F'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
+    {'tle_designation' : 'XW-2F', 'in_scope': true, 'amsat_status_designations': ['XW-2F'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
             'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.340},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.990}
+            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.990},
+            'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.975},
+            'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.955}
         }
     },
     
@@ -108,7 +118,7 @@ let satellite_data = [
     {'tle_designation' : 'RS-44', 'in_scope': true, 'amsat_status_designations': ['RS-44'], 'url': 'https://amsat-uk.org/2020/04/30/dosaaf-85-rs-44-amateur-radio-transponder-activated/',
     'frequencies' : 
         {
-            'Beacon' : {'description': 'Beacon', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 435.605},
+            'Beacon' : {'description': 'CW Beacon', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 435.605},
             'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 145.965},
             'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 435.640}
         }
@@ -118,8 +128,8 @@ let satellite_data = [
     'frequencies' : 
         {
             'Beacon' : {'description': 'Beacon', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 435.605},
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 145.965},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 435.640}
+            'Uplink' : {'description': 'FM Uplink', 'type' : 'FM', 'direction' : 'up', 'frequency_mid': 437.500},
+            'Downlink' : {'description' : 'FM Downlink', 'type': 'FM', 'direction':'down', 'frequency_mid': 145.900}
         }
     },
     

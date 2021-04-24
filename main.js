@@ -299,99 +299,99 @@ function predict_passes(station_location) {
 
 function refresh_display() {
   
-  console.log("Refreshing display.")
-  
-  let inner_HTML = ''
-  
-  passes.forEach(pass => {
-    startF = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.start)
-    endF = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.end)
 
-    let tta = Math.floor((pass.start - Date.now()) / 1000 / 60);
-    let ttaText = `<span class="negative">In Progress</span><h5 class="card-title"><span name="${pass.satellite.tle_designation}_current_pointing" class="positive">errr...</span></h5>`
-    if(tta > 0) {
-      ttaText = tta.toString() + " minutes to acquisition."
+  /* First of all work through all the satellites getting current position and doppler */
+  Object.keys(satellites).forEach(key => {
+
+    let satellite = satellites[key]
+    satellite.current_position = satellite.predict(stationLocation.latitude,stationLocation.longitude, stationLocation.height, new Date(Date.now()))
+    /*  Calculate the delta in the distance and thus the velocity and te doppler 
+        and store this distance info for the next iteration of doppler measurement */
+    distanceDelta = distances[satellite.tle_designation] - satellite.current_position.distance
+    satellites[key].current_distance = satellite.current_position.distance
+    distances[satellite.tle_designation] = satellite.current_position.distance
+
+    satellites[key].current_velocity = distanceDelta
+    satellites[key].current_doppler  = distanceDelta / 3e5     
+  })
+    
+  let inner_HTML_all = ''
+  
+  /* Now go through each of the passes and display them */
+  passes.forEach(pass => {
+    
+    let pass_HTML = ''
+
+    let startFormatted = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.start)
+    let endFormatted = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.end)
+
+    let timeToAcquisition = Math.floor((pass.start - Date.now()) / 1000 / 60);
+    let currentPointingFormatted = "Azimuth: " + pass.satellite.current_position.az.toFixed(0) + "° Elevation: " + pass.satellite.current_position.el.toFixed(0) + "° "
+    let timeToAcquisitionFormatted = `<span class="negative">In Progress</span><h5 class="card-title"><span class="positive">${currentPointingFormatted}</span></h5>`
+    if(timeToAcquisition > 0) {
+      timeToAcquisitionFormatted = timeToAcquisition.toString() + " minutes to acquisition."
     } 
 
-    let frequencyF = ''
-    let urlF = ''
-    console.log(pass.satellite.url)
+    let frequencyFormatted = ''
+    let urlFormatted = ''
+    
     if(pass.satellite.url) {
-      urlF = `<p class="card-text"><a target="_blank" href="${pass.satellite.url}">Click for more info</a></p>`
+      urlFormatted = `<p class="card-text"><a target="_blank" href="${pass.satellite.url}">Click for more info</a></p>`
     }
 
+    /* Iterate through the frequencies */
     Object.keys(pass.satellite.frequencies).forEach(key => {
 
-      frequencyF += `<p class="card-text"><b>${pass.satellite.frequencies[key].description}</b>: ${pass.satellite.frequencies[key].frequency_mid} MHz `
+      frequencyFormatted += `<p class="card-text"><b>${pass.satellite.frequencies[key].description}</b>: ${pass.satellite.frequencies[key].frequency_mid} MHz `
       if(pass.satellite.frequencies[key].access_details) {
-        frequencyF += `${pass.satellite.frequencies[key].access_details}</b> `
+        frequencyFormatted += `${pass.satellite.frequencies[key].access_details}</b> `
       }
-      frequencyF += `<b>Doppler Correction</b>: <span name="${pass.satellite.tle_designation}_${key}_current_doppler">Don't know</span> </p>`
+
+      /* Work out doppler frequency */
+      let dopplerFrequency = pass.satellite.frequencies[key].frequency_mid + pass.satellite.current_doppler * pass.satellite.frequencies[key].frequency_mid
+      if(pass.satellite.frequencies[key].direction == 'up') {
+        dopplerFrequency = pass.satellite.frequencies[key].frequency_mid - pass.satellite.current_doppler * pass.satellite.frequencies[key].frequency_mid
+      }
+
+      frequencyFormatted += `<b>Doppler Correction</b>: <span>${dopplerFrequency.toFixed(5)}</span> </p>`        
     })
 
-    inner_HTML += `
+
+    /* Assemble the refreshed HTML*/
+    pass_HTML += `
     <div class="row mt-2">
       <div class="col-12">
         <div class="card m-6">
           <div class="card-body">
-            <h5 class="card-title"><b>${pass.satellite.tle_designation} ${ttaText}</b></h5> 
-            <p class="card-text"><b>Start</b>: ${startF} UTC</p>
-            <p class="card-text"><b>End</b>: ${endF} UTC</p>
+            <h5 class="card-title"><b>${pass.satellite.tle_designation} ${timeToAcquisitionFormatted}</b></h5> 
+            <p class="card-text"><b>Start</b>: ${startFormatted} UTC</p>
+            <p class="card-text"><b>End</b>: ${endFormatted} UTC</p>
             <p class="card-text"><b>Path</b>: ${pass.path} <b>Max El</b>: ${pass.max_el.toFixed(1)} deg.</p></p>
             <p class="card-text">
-              <b>Current Dist</b>: <span name="${pass.satellite.tle_designation}_current_dist">Don't know</span>
-              <b>Current Az</b>: <span name="${pass.satellite.tle_designation}_current_az">Don't know</span>
-              <b>Current El</b>: <span name="${pass.satellite.tle_designation}_current_el">Don't know</span>
-              <b>Current Velocity</b>: <span name="${pass.satellite.tle_designation}_current_vel">Don't know</span>
+              <b>Current Dist</b>: <span name="${pass.satellite.tle_designation}_current_dist">${pass.satellite.current_distance.toFixed(1)}</span>
+              <b>Current Az</b>: <span name="${pass.satellite.tle_designation}_current_az">${pass.satellite.current_position.az.toFixed(0)}</span>
+              <b>Current El</b>: <span name="${pass.satellite.tle_designation}_current_el">${pass.satellite.current_position.el.toFixed(0)}</span>
+              <b>Current Velocity</b>: <span name="${pass.satellite.tle_designation}_current_vel">${pass.satellite.current_velocity.toFixed(1)}</span>
             </p>
             <p class="card-text"><b>AMSAT net +ve reports / 2 hours</b>: ${pass.satellite.amsat_status_report_text}</p>
-             ${frequencyF}
-             ${urlF}
+             ${frequencyFormatted}
+             ${urlFormatted}
           </div>
         </div>
       </div>
     </div>`
+    
+    
+    inner_HTML_all += pass_HTML
   })
 
-  document.getElementById('div_passes').innerHTML = inner_HTML
-  return update_current_locations()
+  document.getElementById('div_passes').innerHTML = inner_HTML_all
+  
+  console.log("Refreshed display.")
+  setTimeout(refresh_display, 1000)
+  return true
 }
 
-function update_current_locations() {
-
-    Object.keys(satellites).forEach(key => {
-      let satellite = satellites[key]
-      let r = satellite.predict(stationLocation.latitude,stationLocation.longitude, stationLocation.height, new Date(Date.now()))
-      
-      // Calculate the delta in the distance and thus the velocity and te doppler shift 
-      distanceDelta = distances[satellite.tle_designation] - r['distance']
-      distances[satellite.tle_designation] = r['distance']
-      doppler = distanceDelta / 3e5 
-
-      
-      for(let e of document.getElementsByName(satellite.tle_designation + '_current_az')) {e.innerHTML=r['az'].toFixed(1)}
-      for(let e of document.getElementsByName(satellite.tle_designation + '_current_el')) {e.innerHTML=r['el'].toFixed(1)}
-      for(let e of document.getElementsByName(satellite.tle_designation + '_current_dist')) {e.innerHTML=r['distance'].toFixed(1)}
-      for(let e of document.getElementsByName(satellite.tle_designation + '_current_vel')) {e.innerHTML=distanceDelta.toFixed(1)}
-      for(let e of document.getElementsByName(satellite.tle_designation + '_current_pointing')) {
-        e.innerHTML="Azimuth: " + r['az'].toFixed(1) + " Elevation " + r['el'].toFixed(1) + "°" 
-      }
-      
-      Object.keys(satellite.frequencies).forEach(key => {
-        let newFrequency = 0
-        if(satellite.frequencies[key].direction == 'up') {
-           newFrequency = satellite.frequencies[key].frequency_mid - doppler * satellite.frequencies[key].frequency_mid
-        } else {
-          newFrequency = satellite.frequencies[key].frequency_mid + doppler * satellite.frequencies[key].frequency_mid
-        }
-
-        for(let e of document.getElementsByName(satellite.tle_designation + '_' + key + '_current_doppler')) {e.innerHTML=newFrequency.toFixed(6) + ' Mhz'}
-      })
-    
-    })
-    setTimeout(update_current_locations, 1000)
-    return true
-}
 
 
 

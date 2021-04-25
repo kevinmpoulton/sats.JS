@@ -300,11 +300,14 @@ function refresh_display() {
     satellite.current_position = satellite.predict(stationLocation.latitude,stationLocation.longitude, stationLocation.height, new Date(Date.now()))
     /*  Calculate the delta in the distance and thus the velocity and te doppler 
         and store this distance info for the next iteration of doppler measurement */
-    distanceDelta = distances[satellite.tle_designation] - satellite.current_position.distance
+    let distanceDelta = distances[satellite.tle_designation] - satellite.current_position.distance
+    let distanceDeltaTime = Date.now() - satellites[key].current_distance_time
+
     satellites[key].current_distance = satellite.current_position.distance
+    satellites[key].current_distance_time = Date.now()
     distances[satellite.tle_designation] = satellite.current_position.distance
 
-    satellites[key].current_velocity = distanceDelta
+    satellites[key].current_velocity = distanceDelta / distanceDeltaTime
        
   })
     

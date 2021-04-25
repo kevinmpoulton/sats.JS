@@ -6,7 +6,7 @@
 
     */ 
 
-function get_day_number(day, month, year, hour = 0, minute = 0, second = 0) {
+function get_day_number(day, month, year, hour = 0, minute = 0, second = 0, milisecond = 0) {
     
     let day_number = 0
 
@@ -20,6 +20,7 @@ function get_day_number(day, month, year, hour = 0, minute = 0, second = 0) {
     day_number = day_number + hour / 24
     day_number = day_number + minute / (24*60)
     day_number = day_number + second / (24*60*60)
+    day_number = day_number + milisecond / (24 * 60 * 60 * 1000)
 
     return day_number
 }
@@ -69,9 +70,9 @@ class Satellite {
         prediction_time.getUTCFullYear(),
         prediction_time.getUTCHours(), 
         prediction_time.getUTCMinutes(),
-        prediction_time.getUTCSeconds())
+        prediction_time.getUTCSeconds(),
+        prediction_time.getUTCMilliseconds())
         
-
     let t1_start_of_year =prediction_time.getUTCFullYear() - 2000 - 1
 
 

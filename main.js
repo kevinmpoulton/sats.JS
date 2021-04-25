@@ -144,6 +144,7 @@ function load_data() {
 
     satellite_elements_loaded++
 
+
   }
 
   if(satellite_elements_loaded == 0) {
@@ -295,22 +296,21 @@ function refresh_display() {
 
   /* First of all work through all the satellites getting current position and doppler */
   Object.keys(satellites).forEach(key => {
+    
+    let predicationDate = Date.now()
 
     let satellite = satellites[key]
-    satellite.current_position = satellite.predict(stationLocation.latitude,stationLocation.longitude, stationLocation.height, new Date(Date.now()))
+    satellite.current_position = satellite.predict(stationLocation.latitude,stationLocation.longitude, stationLocation.height, new Date(predicationDate) )
     /*  Calculate the delta in the distance and thus the velocity and te doppler 
         and store this distance info for the next iteration of doppler measurement */
     let distanceDelta = distances[satellite.tle_designation] - satellite.current_position.distance
     let distanceDeltaTime = Date.now() - satellites[key].current_distance_time
 
     satellites[key].current_distance = satellite.current_position.distance
-    satellites[key].current_distance_time = Date.now()
+    satellites[key].current_distance_time = predicationDate
     distances[satellite.tle_designation] = satellite.current_position.distance
 
-    /* Fix me - this assumes 1s between updates, which is not the case with slower browsers */
-    
     satellites[key].current_velocity = distanceDelta / (distanceDeltaTime / 1000)
-       
   })
     
   let inner_HTML_all = ''
@@ -397,7 +397,7 @@ function refresh_display() {
               <b>Current Dist</b>: <span name="${pass.satellite.tle_designation}_current_dist">${pass.satellite.current_distance.toFixed(1)}</span>
               <b>Current Az</b>: <span name="${pass.satellite.tle_designation}_current_az">${pass.satellite.current_position.az.toFixed(0)}</span>
               <b>Current El</b>: <span name="${pass.satellite.tle_designation}_current_el">${pass.satellite.current_position.el.toFixed(0)}</span>
-              <b>Current Velocity</b>: <span name="${pass.satellite.tle_designation}_current_vel">${pass.satellite.current_velocity.toFixed(1)}</span>
+              <b>Current Velocity</b>: <span name="${pass.satellite.tle_designation}_current_vel">${pass.satellite.current_velocity.toFixed(1)} km/s</span>
             </p>
             <p class="card-text"><b>AMSAT net +ve reports / 2 hours</b>: ${pass.satellite.amsat_status_report_text}</p>
              ${frequencyFormatted}
@@ -413,7 +413,7 @@ function refresh_display() {
 
   document.getElementById('div_passes').innerHTML = inner_HTML_all
   
-  setTimeout(refresh_display, 3000)
+  setTimeout(refresh_display, 1000)
   return true
 }
 

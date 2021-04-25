@@ -307,7 +307,9 @@ function refresh_display() {
     satellites[key].current_distance_time = Date.now()
     distances[satellite.tle_designation] = satellite.current_position.distance
 
-    satellites[key].current_velocity = distanceDelta / distanceDeltaTime
+    /* Fix me - this assumes 1s between updates, which is not the case with slower browsers */
+    
+    satellites[key].current_velocity = distanceDelta / (distanceDeltaTime / 1000)
        
   })
     
@@ -411,7 +413,7 @@ function refresh_display() {
 
   document.getElementById('div_passes').innerHTML = inner_HTML_all
   
-  setTimeout(refresh_display, 1000)
+  setTimeout(refresh_display, 3000)
   return true
 }
 

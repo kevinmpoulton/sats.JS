@@ -29,9 +29,15 @@ function get_day_number(day, month, year, hour = 0, minute = 0, second = 0) {
 
 class Satellite {
   constructor(metadata) {
+    
       this.tle_designation = metadata.tle_designation
       this.amsat_status_designations = metadata.amsat_status_designations
-      this.frequencies = metadata.frequencies
+      
+      this.frequencies = {}
+      Object.keys(metadata.frequencies).forEach(key => {
+          this.frequencies[key] = new Frequency(metadata.frequencies[key])
+      })
+
       this.url = metadata.url
 
       this.readers = []

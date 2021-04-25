@@ -19,7 +19,7 @@ let satellite_data = [
     'frequencies' : 
       {
           'Uplink' : {'description' : 'FM uplink', 'type': 'FM', 'direction' : 'up', 'frequency_mid' : 145.850},
-          'Downlink' : {'description' : 'FM downlink', 'type' : 'FM', 'direction' : 'down', 'frequency_mid' : 436.795}
+          'Downlink' : {'description' : 'FM downlink', 'type' : 'FM', 'direction' : 'down', 'frequency_mid' : 436.795},
       }
     },
 
@@ -27,41 +27,42 @@ let satellite_data = [
     'frequencies' : 
         {
             'Uplink' : {'description': 'FM uplink 67Hz Tone + 2s PL Tone 74.4', 'type' : 'FM', 'direction' : 'up', 'frequency_mid': 145.850},
-            'Downlink' : {'description' : 'FM downlink', 'type': 'FM', 'direction':'down', 'frequency_mid': 436.795}
+            'Downlink' : {'description' : 'FM downlink', 'type': 'FM', 'direction':'down', 'frequency_mid': 436.795},
+            /* JUST TESTING: */
         }
     },
 
     {'tle_designation' : 'CAS-4A', 'in_scope': true, 'amsat_status_designations': ['CAS-4A'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.220},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.870}
+            'CW' : {'description': 'CW Telemetry', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 145.855},
+            'Telemetry' : {'description': 'AX25. 4.8k Baud GMSK Telemetry', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 145.835},
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.220, 'frequency_mid_down': 145.870, 'bandwidth' : 0.02}
         }
     },
     
     {'tle_designation' : 'CAS-4B', 'in_scope': true, 'amsat_status_designations': ['CAS-4B'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.280},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.925}
+            'CW' : {'description': 'CW Telemetry', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 145.910},
+            'Telemetry' : {'description': 'AX25. 4.8k Baud GMSK Telemetry', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 145.890},
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.280, 'frequency_mid_down': 145.925, 'bandwidth' : 0.02}
         }
     },
     
     {'tle_designation' : 'XW-2A', 'in_scope': true, 'amsat_status_designations': ['XW-2A'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.040},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.675},
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.040, 'frequency_mid_down': 145.675, 'bandwidth' : 0.02},
             'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.855},
-            'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.835}
+            'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.835},
         }
     },
     
     {'tle_designation' : 'XW-2B', 'in_scope': true, 'amsat_status_designations': ['XW-2B'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.100},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.740},
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.100, 'frequency_mid_down': 145.740, 'bandwidth' : 0.02},
             'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.725},
             'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.705}
         }
@@ -70,8 +71,7 @@ let satellite_data = [
     {'tle_designation' : 'XW-2C', 'in_scope': true, 'amsat_status_designations': ['XW-2C'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.160},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.805},
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.160, 'frequency_mid_down': 145.805, 'bandwidth' : 0.02},
             'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.790},
             'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 147.770}
         }
@@ -80,8 +80,7 @@ let satellite_data = [
     {'tle_designation' : 'XW-2D', 'in_scope': true, 'amsat_status_designations': ['XW-2D'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.220},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.870},
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.220, 'frequency_mid_down': 145.870, 'bandwidth' : 0.02},
             'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.855},
             'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.835}
         }
@@ -90,8 +89,7 @@ let satellite_data = [
     {'tle_designation' : 'XW-2E', 'in_scope': true, 'amsat_status_designations': ['XW-2E'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.280},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.925},
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.280, 'frequency_mid_down': 145.925, 'bandwidth' : 0.02},
             'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.910},
             'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.890}
         }
@@ -100,18 +98,16 @@ let satellite_data = [
     {'tle_designation' : 'XW-2F', 'in_scope': true, 'amsat_status_designations': ['XW-2F'], 'url': 'https://amsat.org/wordpress/wp-content/uploads/2015/09/XW-2CAS-3-Sats.pdf',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.340},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.990},
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.340, 'frequency_mid_down': 145.990, 'bandwidth' : 0.02},
             'CW' : {'description' : 'CW Beacon', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.975},
             'AX25' : {'description' : 'AX.25 4.8k Baud GMSK Telemetry', 'type': 'beacon', 'direction':'down', 'frequency_mid': 145.955}
         }
     },
     
-    {'tle_designation' : 'AO-07', 'in_scope': true, 'amsat_status_designations': ['[A]_AO-7', '[B]_AO-7'], 'url': 'https://ukamsat.files.wordpress.com/2017/03/camsat-cas-4a-and-cas-4b-news-release.pdf',
+    {'tle_designation' : 'AO-07', 'in_scope': true, 'amsat_status_designations': ['[A]_AO-7', '[B]_AO-7'], 'url': 'https://www.amsat.org/two-way-satellites/ao-7/',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'B Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.150},
-            'Downlink' : {'description' : 'B Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.950}
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 432.150, 'frequency_mid_down': 145.950, 'bandwidth' : 0.06},
         }
     },
     
@@ -119,8 +115,7 @@ let satellite_data = [
     'frequencies' : 
         {
             'Beacon' : {'description': 'CW Beacon', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 435.605},
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 145.965},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 435.640}
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 145.965, 'frequency_mid_down': 435.640, 'bandwidth' : 0.06},
         }
     },
     
@@ -133,11 +128,11 @@ let satellite_data = [
         }
     },
     
-    {'tle_designation' : 'IO-86', 'in_scope': true, 'amsat_status_designations': ['IO-86'], 'url': 'https://amsat-uk.org/tag/io-86/',
+    {'tle_designation' : 'IO-86', 'in_scope': true, 'amsat_status_designations': ['IO-86'], 'url': 'http://amsat.org.ar/satio-86.htm',
     'frequencies' : 
         {
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 145.880},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 435.880}
+            'Uplink' : {'description': 'FM Uplink', 'type' : 'FM', 'direction' : 'up', 'frequency_mid': 145.880},
+            'Downlink' : {'description' : 'FM Downlink', 'type': 'FM', 'direction':'down', 'frequency_mid': 435.880}
         }
     },
     
@@ -145,8 +140,7 @@ let satellite_data = [
     'frequencies' : 
         {
             'Beacon' : {'description': 'Beacon', 'type' : 'beacon', 'direction' : 'down', 'frequency_mid': 145.925},
-            'Uplink' : {'description': 'Linear Uplink', 'type' : 'linear', 'direction' : 'up', 'frequency_mid': 435.280},
-            'Downlink' : {'description' : 'Linear Downlink', 'type': 'linear', 'direction':'down', 'frequency_mid': 145.925}
+            'Linear' : {'description': 'Linear Inverting', 'type' : 'linear_inverting', 'frequency_mid_up': 435.280, 'frequency_mid_down': 145.925, 'bandwidth' : 0.02},
         }
     }
 

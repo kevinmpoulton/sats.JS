@@ -34,8 +34,6 @@ const MINIMUM_PASS_ELEVATION = 10   // The minimum elevation for which we want t
 function load_data() {
     
   if(analysisStep == 0) {
-
-    console.log("Starting step 0")
       
     /* Kick off the loading of the analysis file */
     let elements_url = 'https://api.secondinternet.com/satellites/elements/'
@@ -59,8 +57,6 @@ function load_data() {
       
     })
     
-    console.log("...started loading " + filesToLoad + " files and moving to step 1")
-
     analysisStep = 1
 
     setTimeout(load_data, 1000)
@@ -69,7 +65,6 @@ function load_data() {
 
   /* Step 1 checks to see if the files we have kicked off loading have completed yet */
   if(analysisStep == 1) {
-    console.log("Starting step 1")
 
     attempts++;
 
@@ -97,7 +92,6 @@ function load_data() {
     }
       
     if(all_loaded == false) {
-      console.log("...Not all satellite files loaded (done",filesLoaded,"/", filesToLoad,"), trying again")
       if(attempts < 6) {
         setTimeout(load_data, 1000)
       } else {
@@ -110,7 +104,6 @@ function load_data() {
     console.log("...All satellite files loaded (", filesLoaded, ")")
   }
 
-  console.log("Starting step 2")
 
   /* At this point all files are loaded so we proceed normally */
   /* First order of business is to process the elements file and 
@@ -192,7 +185,6 @@ function load_data() {
   )
 
   /* Ok, at this point all data is loaded and made ready for analysis */
-  console.log("Completed load process, now moving to stage 3")
   analysisStep = 3 
 }
 
@@ -212,6 +204,7 @@ function predict_passes(station_location) {
   let station_latitude =  station_location.latitude
   let station_height    =  station_location.height
   
+  console.log("Predicting for Longitude: ", station_longitude, " Latitude: ", station_latitude)
 
   if(analysisStep != 3) {
     return 'Satellites not yet loaded correctly...give it a second.'
@@ -312,7 +305,7 @@ function refresh_display() {
     distances[satellite.tle_designation] = satellite.current_position.distance
 
     satellites[key].current_velocity = distanceDelta
-    satellites[key].current_doppler  = distanceDelta / 3e5     
+       
   })
     
   let inner_HTML_all = ''
@@ -320,12 +313,17 @@ function refresh_display() {
   /* Now go through each of the passes and display them */
   passes.forEach(pass => {
     
+    if (pass.end < Date.now()) {
+      return
+    }
+    
     let pass_HTML = ''
 
     let startFormatted = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.start)
     let endFormatted = Intl.DateTimeFormat('en', { timeZone: 'utc', weekday: 'long', month: 'short', day: 'numeric', hour12: 'false', hour: '2-digit', minute: 'numeric', second: 'numeric' }).format(pass.end)
 
     let timeToAcquisition = Math.floor((pass.start - Date.now()) / 1000 / 60);
+
     let currentPointingFormatted = "Azimuth: " + pass.satellite.current_position.az.toFixed(0) + "° Elevation: " + pass.satellite.current_position.el.toFixed(0) + "° "
     let timeToAcquisitionFormatted = `<span class="negative">In Progress</span><h5 class="card-title"><span class="positive">${currentPointingFormatted}</span></h5>`
     if(timeToAcquisition > 0) {
@@ -342,18 +340,41 @@ function refresh_display() {
     /* Iterate through the frequencies */
     Object.keys(pass.satellite.frequencies).forEach(key => {
 
-      frequencyFormatted += `<p class="card-text"><b>${pass.satellite.frequencies[key].description}</b>: ${pass.satellite.frequencies[key].frequency_mid} MHz `
-      if(pass.satellite.frequencies[key].access_details) {
-        frequencyFormatted += `${pass.satellite.frequencies[key].access_details}</b> `
-      }
+      let thisFrequency = pass.satellite.frequencies[key]
+      
+      /* Linear inverting are more elaborate */
+      if(thisFrequency.type == 'linear_inverting') {
+        let table = thisFrequency.getFormattedLinear(pass.satellite.current_velocity);
+        
+        frequencyFormatted += `<p class="card-text">Linear inverting 
+          - Up is ${Frequency.formatAsString(thisFrequency.frequency_mid_up)} 
+          - Down is ${Frequency.formatAsString(thisFrequency.frequency_mid_down)} 
+          - Bandwidth is ${Frequency.formatAsString(thisFrequency.bandwidth)} 
+        </p>`
+        frequencyFormatted += `<table class="table">`
+        frequencyFormatted += `<thead><tr><th scope="col">Transmit on (LSB)</th><th scope="col">Satellite in </th><th scope="col">Satellite out</th><th scope="col">Heard on (USB)</th></tr></thead>`
+        frequencyFormatted += `<tbody>`
+        table.forEach(row => {
+          frequencyFormatted += `<tr><td>${row[0]} MHz</td><td>${row[1]} MHz</td><td>${row[2]} MHz</td><td>${row[3]} MHz</td></tr>`
+        })
+        frequencyFormatted += `</tbody>`
+        frequencyFormatted += `</table>`
+      } 
+      
+    /* Rest we just display the code */  
+    else {
 
-      /* Work out doppler frequency */
-      let dopplerFrequency = pass.satellite.frequencies[key].frequency_mid + pass.satellite.current_doppler * pass.satellite.frequencies[key].frequency_mid
-      if(pass.satellite.frequencies[key].direction == 'up') {
-        dopplerFrequency = pass.satellite.frequencies[key].frequency_mid - pass.satellite.current_doppler * pass.satellite.frequencies[key].frequency_mid
-      }
+        frequencyFormatted += `<p class="card-text"><b>${thisFrequency.description}</b>: ${Frequency.formatAsString(thisFrequency.frequency_mid)} MHz `
+        
+        if(thisFrequency.access_details) {
+          frequencyFormatted += `${thisFrequency.access_details}</b> `
+        }
 
-      frequencyFormatted += `<b>Doppler Correction</b>: <span>${dopplerFrequency.toFixed(5)}</span> </p>`        
+        /* Work out doppler frequency */
+        let dopplerFrequencyFormatted = Frequency.formatAsString(Frequency.adjustForDoppler(thisFrequency.frequency_mid, thisFrequency.direction,  satellite.current_velocity))
+
+        frequencyFormatted += `<b>Corrected for Doppler</b>: <span>${dopplerFrequencyFormatted} MHz</span> </p>`        
+      }
     })
 
 
@@ -387,7 +408,6 @@ function refresh_display() {
 
   document.getElementById('div_passes').innerHTML = inner_HTML_all
   
-  console.log("Refreshed display.")
   setTimeout(refresh_display, 1000)
   return true
 }

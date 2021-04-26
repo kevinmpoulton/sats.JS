@@ -376,7 +376,7 @@ function refresh_display() {
         }
 
         /* Work out doppler frequency */
-        let dopplerFrequencyFormatted = Frequency.formatAsString(Frequency.adjustForDoppler(thisFrequency.frequency_mid, thisFrequency.direction,  satellite.current_velocity))
+        let dopplerFrequencyFormatted = Frequency.formatAsString(Frequency.adjustForDoppler(thisFrequency.frequency_mid, thisFrequency.direction,  pass.satellite.current_velocity))
 
         frequencyFormatted += `<b>Corrected for Doppler</b>: <span>${dopplerFrequencyFormatted} MHz</span> </p>`        
       }

@@ -351,7 +351,7 @@ function refresh_display() {
       if(thisFrequency.type == 'linear_inverting') {
         let table = thisFrequency.getFormattedLinear(pass.satellite.current_velocity);
         
-        frequencyFormatted += `<p class="card-text">Linear inverting 
+        frequencyFormatted += `<p class="card-text"><b>Linear inverting</b> 
           - Up is ${Frequency.formatAsString(thisFrequency.frequency_mid_up)} 
           - Down is ${Frequency.formatAsString(thisFrequency.frequency_mid_down)} 
           - Bandwidth is ${Frequency.formatAsString(thisFrequency.bandwidth)} 

@@ -3,7 +3,9 @@ let satellite_data = [
     {'tle_designation' : 'ISS', 'in_scope': true,  'amsat_status_designations': ['ISS-DATA', 'ISS-DATV', 'ISS-FM'], 'url': 'https://www.ariss.org/current-status-of-iss-stations.html',
     'frequencies' : 
       {
-          'Packet': {'description': 'Packet', 'type': 'Packet', 'direction': 'down', 'frequency_mid': 145.800 }
+          'Packet': {'description': 'Packet', 'type': 'Packet', 'direction': 'down', 'frequency_mid': 145.800 },
+          'Uplink' : {'description' : 'FM uplink 67Hz Tone', 'type': 'FM', 'direction' : 'up', 'frequency_mid' : 145.990},
+          'Downlink' : {'description' : 'FM downlink', 'type' : 'FM', 'direction' : 'down', 'frequency_mid' : 437.800}
       }
     },
 

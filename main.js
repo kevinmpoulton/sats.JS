@@ -364,6 +364,7 @@ function refresh_display() {
         })
         frequencyFormatted += `</tbody>`
         frequencyFormatted += `</table>`
+
       } 
       
     /* Rest we just display the code */  
